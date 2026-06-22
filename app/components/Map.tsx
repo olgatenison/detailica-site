@@ -73,9 +73,9 @@ function MapPin({ country, delay }: { country: Country; delay: number }) {
   );
 }
 
-export function GlobalPresenceSection() {
+export default function GlobalPresenceSection() {
   return (
-    <section className="relative w-full overflow-hidden bg-white py-12 ">
+    <section className="relative w-full overflow-hidden bg-white pb-12 ">
       {/* <div className="mx-auto max-w-3xl px-6 text-center lg:px-8">
         <p className="text-sm font-medium tracking-widest text-gray-500 uppercase">
           Limitless

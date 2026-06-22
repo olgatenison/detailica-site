@@ -1,15 +1,17 @@
 "use client";
 
+import { Fragment } from "react";
 import {
   Disclosure,
   DisclosureButton,
   DisclosurePanel,
 } from "@headlessui/react";
-import { Bars2Icon } from "@heroicons/react/24/solid";
-import { motion } from "framer-motion";
-
-// import { Logo } from "./logo";
-import { PlusGrid, PlusGridItem, PlusGridRow } from "./ui/plus-grid";
+import { Bars2Icon, XMarkIcon } from "@heroicons/react/24/solid";
+import { AnimatePresence, motion } from "framer-motion";
+import { clsx } from "clsx";
+import Link from "next/link";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
 
 const links = [
   { href: "/services", label: "Services" },
@@ -18,85 +20,231 @@ const links = [
   { href: "/contact", label: "Contact" },
 ];
 
+/* ---------- decorative plus-grid ---------- */
+
+function PlusGridIcon({
+  placement,
+  className = "",
+}: {
+  placement: `${"top" | "bottom"} ${"left" | "right"}`;
+  className?: string;
+}) {
+  const [yAxis, xAxis] = placement.split(" ");
+
+  return (
+    <svg
+      viewBox="0 0 15 15"
+      aria-hidden="true"
+      className={clsx(
+        "absolute size-3.75 fill-black/10",
+        yAxis === "top" ? "-top-2" : "-bottom-2",
+        xAxis === "left" ? "-left-2" : "-right-2",
+        className,
+      )}
+    >
+      <path d="M8 0H7V7H0V8H7V15H8V8H15V7H8V0Z" />
+    </svg>
+  );
+}
+
+function PlusGridItem({
+  className = "",
+  children,
+}: {
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className={clsx("group/item relative", className)}>
+      <PlusGridIcon
+        placement="top left"
+        className="hidden group-first/item:block"
+      />
+      <PlusGridIcon placement="top right" />
+      <PlusGridIcon
+        placement="bottom left"
+        className="hidden group-first/item:group-last/row:block"
+      />
+      <PlusGridIcon
+        placement="bottom right"
+        className="hidden group-last/row:block"
+      />
+      {children}
+    </div>
+  );
+}
+
+function PlusGridRow({
+  className = "",
+  children,
+}: {
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      className={clsx(
+        "group/row relative isolate pt-[calc(var(--spacing)*2+1px)] last:pb-[calc(var(--spacing)*2+1px)]",
+        className,
+      )}
+    >
+      <div
+        aria-hidden="true"
+        className="absolute inset-y-0 left-1/2 -z-10 w-screen -translate-x-1/2"
+      >
+        <div className="absolute inset-x-0 top-0 border-t border-black/5" />
+        <div className="absolute inset-x-0 top-2 border-t border-black/5" />
+        <div className="absolute inset-x-0 bottom-0 hidden border-b border-black/5 group-last/row:block" />
+        <div className="absolute inset-x-0 bottom-2 hidden border-b border-black/5 group-last/row:block" />
+      </div>
+
+      {children}
+    </div>
+  );
+}
+
+/* ---------- desktop nav ---------- */
+
 function DesktopNav() {
+  const pathname = usePathname();
+
   return (
     <nav className="relative hidden lg:flex">
-      {links.map(({ href, label }) => (
-        <PlusGridItem key={href} className="relative flex">
-          <Link
-            href={href}
-            className="flex items-center px-4 py-3 text-base font-medium text-gray-950 bg-blend-multiply data-hover:bg-black/2.5"
-          >
-            {label}
-          </Link>
-        </PlusGridItem>
-      ))}
+      {links.map(({ href, label }) => {
+        const active = pathname === href;
+
+        return (
+          <PlusGridItem key={href} className="flex">
+            <Link
+              href={href}
+              aria-current={active ? "page" : undefined}
+              className={clsx(
+                "flex items-center px-4 py-3 text-base font-medium transition-colors hover:bg-black/2.5",
+                active ? "text-gray-950" : "text-gray-600 hover:text-gray-950",
+              )}
+            >
+              {label}
+            </Link>
+          </PlusGridItem>
+        );
+      })}
     </nav>
   );
 }
 
-function MobileNavButton() {
+/* ---------- mobile nav ---------- */
+
+function MobileNavButton({ open }: { open: boolean }) {
   return (
     <DisclosureButton
-      className="flex size-12 items-center justify-center self-center rounded-lg data-hover:bg-black/5 lg:hidden"
-      aria-label="Open main menu"
+      className="relative flex size-12 items-center justify-center self-center rounded-lg data-hover:bg-black/5 lg:hidden"
+      aria-label={open ? "Close main menu" : "Open main menu"}
     >
-      <Bars2Icon className="size-6" />
+      <AnimatePresence initial={false} mode="wait">
+        {open ? (
+          <motion.span
+            key="close"
+            initial={{ opacity: 0, rotate: -90 }}
+            animate={{ opacity: 1, rotate: 0 }}
+            exit={{ opacity: 0, rotate: 90 }}
+            transition={{ duration: 0.15 }}
+          >
+            <XMarkIcon className="size-6" />
+          </motion.span>
+        ) : (
+          <motion.span
+            key="open"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+          >
+            <Bars2Icon className="size-6" />
+          </motion.span>
+        )}
+      </AnimatePresence>
     </DisclosureButton>
   );
 }
 
 function MobileNav() {
+  const pathname = usePathname();
+
   return (
-    <DisclosurePanel className="lg:hidden">
-      <div className="flex flex-col gap-6 py-4">
-        {links.map(({ href, label }, linkIndex) => (
-          <motion.div
-            initial={{ opacity: 0, rotateX: -90 }}
-            animate={{ opacity: 1, rotateX: 0 }}
-            transition={{
-              duration: 0.15,
-              ease: "easeInOut",
-              rotateX: { duration: 0.3, delay: linkIndex * 0.1 },
-            }}
-            key={href}
-          >
-            <Link href={href} className="text-base font-medium text-gray-950">
-              {label}
-            </Link>
-          </motion.div>
-        ))}
+    <DisclosurePanel className="relative lg:hidden">
+      <div className="flex flex-col gap-4 px-4 py-4 sm:px-6">
+        {links.map(({ href, label }, i) => {
+          const active = pathname === href;
+
+          return (
+            <motion.div
+              key={href}
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2, delay: i * 0.05 }}
+            >
+              <DisclosureButton as={Fragment}>
+                <Link
+                  href={href}
+                  aria-current={active ? "page" : undefined}
+                  className={clsx(
+                    "block text-base font-medium",
+                    active ? "text-gray-950" : "text-gray-600",
+                  )}
+                >
+                  {label}
+                </Link>
+              </DisclosureButton>
+            </motion.div>
+          );
+        })}
       </div>
-      <div className="absolute left-1/2 w-screen -translate-x-1/2">
-        <div className="absolute inset-x-0 top-0 border-t border-black/5" />
-        <div className="absolute inset-x-0 top-2 border-t border-black/5" />
-      </div>
+
+      <div className="absolute inset-x-0 top-0 border-t border-black/5" />
+      <div className="absolute inset-x-0 top-2 border-t border-black/5" />
     </DisclosurePanel>
   );
 }
 
+/* ---------- navbar ---------- */
+
 export function Navbar({ banner }: { banner?: React.ReactNode }) {
   return (
-    <Disclosure as="header" className="pt-12 sm:pt-16">
-      <PlusGrid>
-        <PlusGridRow className="relative flex justify-between">
-          <div className="relative flex gap-6">
-            <PlusGridItem className="py-3">
-              <Link href="/" title="Home">
-                <Logo className="h-9" />
-              </Link>
-            </PlusGridItem>
-            {banner && (
-              <div className="relative hidden items-center py-3 lg:flex">
-                {banner}
+    <Disclosure as="header" className="pt-6">
+      {({ open }) => (
+        <>
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <PlusGridRow className="relative flex justify-between">
+              <div className="relative flex items-center gap-6">
+                <PlusGridItem className="py-3">
+                  <Link href="/" title="Home" className="flex items-center">
+                    <Image
+                      src="/logo-line.svg"
+                      alt="Logo"
+                      width={80}
+                      height={26}
+                      className="h-5 w-auto sm:h-6"
+                      priority
+                    />
+                  </Link>
+                </PlusGridItem>
+
+                {banner && (
+                  <div className="relative hidden items-center py-3 lg:flex">
+                    {banner}
+                  </div>
+                )}
               </div>
-            )}
+
+              <DesktopNav />
+
+              <MobileNavButton open={open} />
+            </PlusGridRow>
           </div>
-          <DesktopNav />
-          <MobileNavButton />
-        </PlusGridRow>
-      </PlusGrid>
-      <MobileNav />
+
+          <MobileNav />
+        </>
+      )}
     </Disclosure>
   );
 }

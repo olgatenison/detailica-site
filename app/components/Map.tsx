@@ -1,178 +1,366 @@
 "use client";
 
+import { useState } from "react";
 import { clsx } from "clsx";
 import { motion } from "framer-motion";
 
-type Service = "AR" | "STR" | "BIM";
+type Service = "Architecture" | "Structure" | "BIM";
+type Filter = "All" | Service;
 
 type Country = {
   name: string;
   services: Service[];
   top: string;
   left: string;
+  projects: Partial<Record<Service, string[]>>;
 };
+
+const FILTERS: Filter[] = ["All", "Architecture", "Structure", "BIM"];
 
 const COUNTRIES: Country[] = [
   {
-    name: "Украина",
-    services: ["AR", "STR", "BIM"],
+    name: "Ukraine",
+    services: ["Architecture", "Structure", "BIM"],
     top: "37.4%",
     left: "55.0%",
+    projects: {
+      Architecture: [
+        "Residential Projects",
+        "Public Buildings",
+        "Model Federation",
+      ],
+      Structure: ["Structural Documentation", "Technical Calculations"],
+      BIM: ["BIM Coordination", "Model Federation"],
+    },
   },
-  { name: "Эстония", services: ["STR"], top: "32.4%", left: "53.5%" },
-  { name: "США", services: ["AR"], top: "43.7%", left: "22.0%" },
-  { name: "Нидерланды", services: ["AR"], top: "36.3%", left: "48.4%" },
-  { name: "Канада", services: ["BIM"], top: "40.2%", left: "27.8%" },
-  { name: "Австралия", services: ["AR", "BIM"], top: "83.8%", left: "85.9%" },
-  { name: "Казахстан", services: ["STR"], top: "36.9%", left: "65.5%" },
-  { name: "Швеция", services: ["STR"], top: "32.4%", left: "51.8%" },
-  { name: "Норвегия", services: ["STR"], top: "32.1%", left: "49.9%" },
   {
-    name: "Израиль",
-    services: ["AR", "STR", "BIM"],
+    name: "Estonia",
+    services: ["Structure"],
+    top: "32.4%",
+    left: "53.5%",
+    projects: {
+      Structure: ["Schools", "Hospital", "Public Buildings", "Music School"],
+    },
+  },
+  {
+    name: "United States",
+    services: ["Architecture"],
+    top: "43.7%",
+    left: "22.0%",
+    projects: {
+      Architecture: ["Architectural Documentation", "Concept Support"],
+    },
+  },
+  {
+    name: "Netherlands",
+    services: ["Architecture"],
+    top: "36.3%",
+    left: "48.4%",
+    projects: {
+      Architecture: ["Architecture Support", "Technical Documentation"],
+    },
+  },
+  {
+    name: "Canada",
+    services: ["BIM"],
+    top: "40.2%",
+    left: "27.8%",
+    projects: {
+      BIM: ["BIM Modelling", "Coordination Support"],
+    },
+  },
+  {
+    name: "Australia",
+    services: ["Architecture", "BIM"],
+    top: "83.8%",
+    left: "85.9%",
+    projects: {
+      Architecture: ["Architecture Projects", "Design Documentation"],
+      BIM: ["BIM-Based Workflows", "Model Coordination"],
+    },
+  },
+  {
+    name: "Kazakhstan",
+    services: ["Structure"],
+    top: "36.9%",
+    left: "65.5%",
+    projects: {
+      Structure: ["Structural BIM", "Technical Support"],
+    },
+  },
+  {
+    name: "Sweden",
+    services: ["Structure"],
+    top: "32.4%",
+    left: "51.8%",
+    projects: {
+      Structure: ["Structural Documentation", "Engineering Support"],
+    },
+  },
+  {
+    name: "Norway",
+    services: ["Structure"],
+    top: "32.1%",
+    left: "49.9%",
+    projects: {
+      Structure: ["Structural BIM", "Project Documentation"],
+    },
+  },
+  {
+    name: "Israel",
+    services: ["Architecture", "Structure", "BIM"],
     top: "47.5%",
     left: "56.1%",
+    projects: {
+      Architecture: ["Architecture Projects", "Concept Design"],
+      Structure: ["Structural Engineering", "Technical Support"],
+      BIM: ["BIM Coordination", "Clash Detection"],
+    },
   },
 ];
 
-const SERVICE_STYLES: Record<Service, string> = {
-  AR: "bg-blue-50 text-blue-700 ring-blue-600/20",
-  STR: "bg-amber-50 text-amber-700 ring-amber-600/20",
-  BIM: "bg-emerald-50 text-emerald-700 ring-emerald-600/20",
-};
-
-function ServiceBadge({ service }: { service: Service }) {
-  return (
-    <span
-      className={clsx(
-        "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset",
-        SERVICE_STYLES[service],
-      )}
-    >
-      {service}
-    </span>
-  );
+function getVisibleServices(country: Country, activeFilter: Filter): Service[] {
+  if (activeFilter === "All") return country.services;
+  return country.services.includes(activeFilter) ? [activeFilter] : [];
 }
 
-function MapPin({ country, delay }: { country: Country; delay: number }) {
+function MapPin({
+  country,
+  delay,
+  activeFilter,
+  selectedCountry,
+  onSelect,
+}: {
+  country: Country;
+  delay: number;
+  activeFilter: Filter;
+  selectedCountry: string | null;
+  onSelect: (country: Country) => void;
+}) {
+  const visibleServices = getVisibleServices(country, activeFilter);
+  const isActive = visibleServices.length > 0;
+  const isSelected = selectedCountry === country.name;
+
+  const tooltipProjects =
+    activeFilter === "All"
+      ? []
+      : (country.projects[activeFilter]?.slice(0, 2) ?? []);
+
   return (
-    <motion.div
+    <motion.button
+      type="button"
       initial={{ scale: 0, opacity: 0 }}
       whileInView={{ scale: 1, opacity: 1 }}
       viewport={{ once: true }}
       transition={{ duration: 0.3, delay, ease: "easeOut" }}
       style={{ top: country.top, left: country.left }}
-      className="group absolute -translate-x-1/2 -translate-y-1/2"
+      onClick={() => {
+        if (isActive) onSelect(country);
+      }}
+      className={clsx(
+        "group absolute z-0 -translate-x-1/2 -translate-y-1/2 rounded-full transition hover:z-20 focus-visible:z-20",
+        isActive ? "cursor-pointer" : "cursor-default",
+      )}
+      aria-label={country.name}
     >
-      <span className="block size-2.5 rounded-full bg-gray-950 ring-4 ring-gray-950/15" />
-      <span className="pointer-events-none absolute -top-9 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1.5 whitespace-nowrap rounded-full bg-gray-950 px-2.5 py-1 text-xs font-medium text-white opacity-0 transition-opacity group-hover:opacity-100">
-        {country.name}
-        <span className="opacity-70">{country.services.join(" · ")}</span>
+      <span
+        className={clsx(
+          "block rounded-full transition-all duration-300",
+          isSelected ? "size-3.5 ring-6" : "size-2.5 ring-4",
+          isActive
+            ? "bg-accent ring-accent/20 group-hover:bg-gray-950 group-hover:ring-gray-950/20 group-focus-visible:bg-gray-950 group-focus-visible:ring-gray-950/20"
+            : "bg-gray-300 ring-gray-300/20",
+        )}
+      />
+
+      <span
+        className={clsx(
+          "pointer-events-none absolute bottom-5 left-1/2 z-20 w-max max-w-64 -translate-x-1/2 rounded-sm bg-gray-950 px-3 py-2 text-left text-xs font-medium text-white opacity-0 shadow-lg transition-opacity",
+          isActive ? "group-hover:opacity-100" : "hidden",
+        )}
+      >
+        <span className="block">{country.name}</span>
+
+        <span className="mt-0.5 block text-white/60">
+          {visibleServices.join(" · ")}
+        </span>
+
+        {tooltipProjects.length > 0 && (
+          <span className="mt-2 block space-y-0.5 text-white/80">
+            {tooltipProjects.map((project) => (
+              <span key={project} className="block">
+                {project}
+              </span>
+            ))}
+          </span>
+        )}
       </span>
+    </motion.button>
+  );
+}
+
+function CountryCard({
+  country,
+  activeFilter,
+  onClose,
+}: {
+  country: Country;
+  activeFilter: Filter;
+  onClose: () => void;
+}) {
+  const cardServices = getVisibleServices(country, activeFilter);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -14 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.25, ease: "easeOut" }}
+      className="rounded-3xl border border-gray-200 bg-white/95 p-6 shadow-xl backdrop-blur"
+    >
+      <div className="flex flex-row items-start justify-between gap-4">
+        <div>
+          <p className="text-xl font-medium uppercase tracking-[0.18em] text-accent">
+            {cardServices.join(" · ")}
+          </p>
+
+          <h3 className="mt-2 text-2xl font-semibold text-gray-950">
+            {country.name}
+          </h3>
+        </div>
+
+        <button
+          type="button"
+          onClick={onClose}
+          className="self-start text-sm font-medium uppercase text-gray-400 transition hover:text-gray-950"
+        >
+          Close
+        </button>
+      </div>
+
+      <div className="mt-5 space-y-5">
+        {cardServices.map((service) => {
+          const items = country.projects[service] ?? [];
+
+          if (items.length === 0) return null;
+
+          return (
+            <div key={service}>
+              {cardServices.length > 1 && (
+                <p className="self-start text-sm font-medium uppercase text-gray-400 transition">
+                  {service}
+                </p>
+              )}
+
+              <ul
+                className={clsx(
+                  "grid gap-2 sm:grid-cols-2",
+                  cardServices.length > 1 && "mt-2",
+                )}
+              >
+                {items.map((project) => (
+                  <li
+                    key={project}
+                    className=" bg-accent/10 px-4 py-3 text-sm font-medium text-gray-800"
+                  >
+                    {project}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          );
+        })}
+      </div>
     </motion.div>
   );
 }
 
 export default function GlobalPresenceSection() {
-  return (
-    <section className="relative w-full overflow-hidden bg-white pb-12 ">
-      {/* <div className="mx-auto max-w-3xl px-6 text-center lg:px-8">
-        <p className="text-sm font-medium tracking-widest text-gray-500 uppercase">
-          Limitless
-        </p>
-        <h2 className="mt-2 text-4xl font-medium tracking-tight text-gray-950 sm:text-5xl">
-          Работаем по всему миру
-        </h2>
-        <p className="mt-4 text-lg text-gray-600">
-          {COUNTRIES.length} стран, в которых мы оказываем услуги AR, STR и BIM.
-        </p>
-      </div> */}
+  const [activeFilter, setActiveFilter] = useState<Filter>("All");
+  const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
 
-      <div className="mx-auto mt-16 max-w-6xl ">
+  const visibleSelectedCountry =
+    selectedCountry &&
+    getVisibleServices(selectedCountry, activeFilter).length > 0
+      ? selectedCountry
+      : null;
+
+  return (
+    <section className="relative w-full overflow-hidden bg-white pb-12">
+      <div className="mx-auto max-w-3xl px-6 pt-6 md:pt-18 text-center lg:px-8">
+        <p className="text-sm font-medium tracking-widest text-gray-500 uppercase">
+          Supporting Projects Across 10 Countries
+        </p>
+
+        <h2 className="mt-5 text-xl font-semibold text-gray-950 text-balance sm:text-5xl">
+          International Project Experience
+        </h2>
+      </div>
+
+      <div className="mx-auto mt-8 flex flex-wrap justify-center gap-3 px-6">
+        {FILTERS.map((filter) => {
+          const isActive = activeFilter === filter;
+
+          return (
+            <button
+              key={filter}
+              type="button"
+              onClick={() => {
+                setActiveFilter(filter);
+                setSelectedCountry(null);
+              }}
+              className={clsx(
+                "inline-flex h-6 items-center justify-center border px-3 text-sm font-medium transition",
+                isActive
+                  ? "border-accent text-accent"
+                  : "border-white bg-white text-black hover:text-accent",
+              )}
+            >
+              {filter}
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="relative mx-auto mt-10 max-w-5xl px-4 sm:px-6 lg:px-8">
         <div className="relative aspect-636.5/336.5 w-full">
-          <div className="absolute inset-0 mask-[url(/map.svg)] [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain] bg-gray-300" />
+          <div className="absolute inset-0 mask-[url(/map.svg)] mask-center mask-no-repeat mask-contain bg-gray-300" />
+
           {COUNTRIES.map((country, i) => (
-            <MapPin key={country.name} country={country} delay={i * 0.05} />
+            <MapPin
+              key={country.name}
+              country={country}
+              delay={i * 0.05}
+              activeFilter={activeFilter}
+              selectedCountry={selectedCountry?.name ?? null}
+              onSelect={setSelectedCountry}
+            />
           ))}
+
+          {visibleSelectedCountry && (
+            <div className="absolute left-1/2 top-4 z-30 hidden w-[calc(100%-2rem)] max-w-2xl -translate-x-1/2 sm:block sm:top-6">
+              <CountryCard
+                country={visibleSelectedCountry}
+                activeFilter={activeFilter}
+                onClose={() => setSelectedCountry(null)}
+              />
+            </div>
+          )}
         </div>
       </div>
 
-      <ul className="mx-auto mt-20 grid max-w-5xl grid-cols-1 gap-3 px-6 sm:grid-cols-2 lg:grid-cols-5 lg:px-8">
-        {COUNTRIES.map((country) => (
-          <li
-            key={country.name}
-            className="flex items-center justify-between gap-3 rounded-md bg-gray-50 px-4 py-3"
-          >
-            <span className="text-sm font-medium text-gray-950">
-              {country.name}
-            </span>
-            <span className="flex gap-1">
-              {country.services.map((s) => (
-                <ServiceBadge key={s} service={s} />
-              ))}
-            </span>
-          </li>
-        ))}
-      </ul>
+      <p className="mt-6 text-center text-sm font-medium text-gray-500 sm:hidden">
+        Tap a highlighted location
+      </p>
+
+      {visibleSelectedCountry && (
+        <div className="mx-4 mt-6 sm:hidden">
+          <CountryCard
+            country={visibleSelectedCountry}
+            activeFilter={activeFilter}
+            onClose={() => setSelectedCountry(null)}
+          />
+        </div>
+      )}
     </section>
   );
 }
-
-// "use client";
-
-// import { motion } from "framer-motion";
-
-// function Marker({
-//   src,
-//   top,
-//   offset,
-//   delay,
-// }: {
-//   src: string;
-//   top: number;
-//   offset: number;
-//   delay: number;
-// }) {
-//   return (
-//     <motion.div
-//       variants={{
-//         idle: { scale: 0, opacity: 0, rotateX: 0, rotate: 0, y: 0 },
-//         active: { y: [-20, 0, 4, 0], scale: [0.75, 1], opacity: [0, 1] },
-//       }}
-//       transition={{ duration: 0.25, delay, ease: "easeOut" }}
-//       style={{ "--offset": `${offset}px`, top } as React.CSSProperties}
-//       className="absolute left-[calc(50%+var(--offset))] size-9.5 drop-shadow-[0_3px_1px_rgba(0,0,0,.15)]"
-//     >
-//       <svg fill="none" viewBox="0 0 38 38" className="absolute size-full">
-//         <path
-//           d="M29.607 5.193c5.858 5.857 5.858 15.355 0 21.213l-9.9 9.9-.707.706-.708-.708-9.899-9.898c-5.857-5.858-5.857-15.356 0-21.213 5.858-5.858 15.356-5.858 21.214 0Z"
-//           className="fill-black/5"
-//         />
-//         <path
-//           d="m28.9 25.698-9.9 9.9-9.9-9.9C3.634 20.232 3.634 11.367 9.1 5.9 14.569.432 23.433.432 28.9 5.9c5.467 5.468 5.467 14.332 0 19.8Z"
-//           className="fill-white"
-//         />
-//       </svg>
-//       <img
-//         alt=""
-//         src={src}
-//         className="absolute top-1 left-1.75 size-6 rounded-full"
-//       />
-//     </motion.div>
-//   );
-// }
-
-// export function Map() {
-//   return (
-//     <div aria-hidden="true" className="relative size-full">
-//       <div className="absolute inset-0 bg-[url(/map.png)] mask-[linear-gradient(to_bottom,black_50%,transparent)] bg-size-[530px_430px] bg-position-[center_-75px] bg-no-repeat" />
-//       <div className="absolute inset-0">
-//         <Marker src="/map/1.jpg" top={96} offset={-128} delay={0.15} />
-//         <Marker src="/map/2.jpg" top={160} offset={-16} delay={0.4} />
-//         <Marker src="/map/3.jpg" top={144} offset={96} delay={0.3} />
-//         <Marker src="/map/4.jpg" top={192} offset={64} delay={0.6} />
-//         <Marker src="/map/5.jpg" top={224} offset={-32} delay={0.8} />
-//       </div>
-//     </div>
-//   );
-// }

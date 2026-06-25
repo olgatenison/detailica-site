@@ -3,7 +3,7 @@ import Link from "next/link";
 export default function Footer() {
   return (
     <footer className="border-t border-zinc-200 bg-zinc-50">
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 py-12 md:px-6 ">
         <div className="grid gap-10 md:grid-cols-3">
           <div>
             <p className="text-xs uppercase tracking-[0.25em] text-zinc-500">
@@ -17,31 +17,19 @@ export default function Footer() {
           </div>
 
           <div className="flex flex-col gap-3 text-sm text-zinc-600 md:items-center">
-            <Link
-              href="/#services"
-              className="transition hover:text-black"
-            >
+            <Link href="/#services" className="transition hover:text-black">
               Services
             </Link>
 
-            <Link
-              href="/#projects"
-              className="transition hover:text-black"
-            >
+            <Link href="/#projects" className="transition hover:text-black">
               Projects
             </Link>
 
-            <Link
-              href="/#about"
-              className="transition hover:text-black"
-            >
+            <Link href="/#about" className="transition hover:text-black">
               About
             </Link>
 
-            <Link
-              href="/#contact"
-              className="transition hover:text-black"
-            >
+            <Link href="/#contact" className="transition hover:text-black">
               Contact
             </Link>
           </div>
@@ -54,9 +42,7 @@ export default function Footer() {
               hello@detailica.com
             </a>
 
-            <p className="mt-2">
-              [Company Address]
-            </p>
+            <p className="mt-2">[Company Address]</p>
           </div>
         </div>
 
@@ -70,12 +56,12 @@ export default function Footer() {
             >
               Privacy Policy
             </Link>
-<Link
-  href="/legal-information"
-  className="transition hover:text-black"
->
-  Legal Information
-</Link>
+            <Link
+              href="/legal-information"
+              className="transition hover:text-black"
+            >
+              Legal Information
+            </Link>
           </div>
         </div>
       </div>

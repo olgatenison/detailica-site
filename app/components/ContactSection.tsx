@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { FormEvent, useState } from "react";
+import Image from "next/image";
 
 type Errors = {
   name?: string;
@@ -92,17 +93,17 @@ export function ContactSection() {
     <section className="bg-white px-4 py-24 text-gray-950 sm:px-6 lg:px-8">
       <div className="mx-auto grid max-w-7xl grid-cols-1 gap-16 lg:grid-cols-2 lg:gap-24">
         <div>
-          <h1 className="max-w-xl text-6xl font-semibold tracking-tight text-balance sm:text-7xl lg:text-8xl">
-            Let’s collaborate.
+          <h1 className="max-w-lg text-6xl font-semibold tracking-tight text-balance sm:text-7xl ">
+            Let’s make it done together
           </h1>
 
-          <div className="mt-12 max-w-xl space-y-6 text-base leading-7 text-gray-700">
+          <div className="text-base leading-7 text-gray-500 sm:text-lg max-w-xl mt-12">
             <p>
               We provide architectural, structural, and BIM support for building
               and infrastructure projects.
             </p>
 
-            <p>
+            <p className="mt-6">
               If you are looking for a reliable partner to support your project
               team with documentation, coordination, or technical delivery, send
               us a message.
@@ -110,20 +111,29 @@ export function ContactSection() {
           </div>
 
           <div className="mt-12 text-sm leading-6">
-            <p className="font-semibold text-[#D15052]">DETAILICA</p>
+            <Link href="/" title="Home" className="flex items-center mb-6">
+              <Image
+                src="/logo-line.svg"
+                alt="Logo"
+                width={80}
+                height={26}
+                className="h-5 w-auto sm:h-6"
+                priority
+              />
+            </Link>
             <a
               href="mailto:hello@detailica.com"
-              className="text-gray-950 underline underline-offset-4"
+              className="text-gray-950 underline underline-offset-4 "
             >
-              hello@detailica.com
+              our e-mail: hello@detailica.com
             </a>
           </div>
         </div>
 
         <form className="w-full" onSubmit={handleSubmit} noValidate>
-          <div className="space-y-10">
+          <div className="space-y-6">
             <div>
-              <label htmlFor="name" className="block text-lg font-medium">
+              <label htmlFor="name" className="block text-base font-medium">
                 Name <span aria-hidden="true">*</span>
               </label>
 
@@ -142,7 +152,7 @@ export function ContactSection() {
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-lg font-medium">
+              <label htmlFor="email" className="block text-base font-medium">
                 Email <span aria-hidden="true">*</span>
               </label>
 
@@ -161,7 +171,7 @@ export function ContactSection() {
             </div>
 
             <div>
-              <label htmlFor="message" className="block text-lg font-medium">
+              <label htmlFor="message" className="block text-base font-medium">
                 Message <span aria-hidden="true">*</span>
               </label>
 
@@ -169,15 +179,13 @@ export function ContactSection() {
                 id="message"
                 name="message"
                 required
-                rows={6}
+                rows={5}
                 placeholder="Tell us about your project, required support, timeline, or documentation scope."
                 className={textareaClassName}
               />
 
               {errors.message && (
-                <p className="mt-2 text-sm text-[#D15052]">
-                  {errors.message}
-                </p>
+                <p className="mt-2 text-sm text-[#D15052]">{errors.message}</p>
               )}
             </div>
 
@@ -207,9 +215,7 @@ export function ContactSection() {
               </div>
 
               {errors.privacy && (
-                <p className="mt-2 text-sm text-[#D15052]">
-                  {errors.privacy}
-                </p>
+                <p className="mt-2 text-sm text-[#D15052]">{errors.privacy}</p>
               )}
             </div>
 
@@ -224,7 +230,7 @@ export function ContactSection() {
             <button
               type="submit"
               disabled={isSending}
-              className="inline-flex h-11 items-center justify-center border border-gray-950 bg-gray-950 px-6 text-sm font-medium text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex h-11 items-center justify-center border border-gray-950 bg-gray-950 px-6 text-sm font-medium text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60 w-full"
             >
               {isSending ? "Sending..." : "Send message"}
             </button>

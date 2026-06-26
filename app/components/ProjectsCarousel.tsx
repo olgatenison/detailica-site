@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import * as Headless from "@headlessui/react";
@@ -15,15 +14,15 @@ import {
 import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import useMeasure, { type RectReadOnly } from "react-use-measure";
 import Link from "next/link";
-
-const services = [
+import Image from "next/image";
+const projects = [
   {
     label: "AR",
     title: "Architectural Documentation",
     description:
       "Support for architectural teams in BIM modeling, drawing production, and project documentation.",
     image: "/services/architectural.jpg",
-    href: "/services",
+    href: "/projects",
   },
   {
     label: "STR",
@@ -31,7 +30,7 @@ const services = [
     description:
       "Structural BIM modeling and drawing production support for reinforced concrete and steel projects.",
     image: "/services/structural.jpg",
-    href: "/services",
+    href: "/projects",
   },
   {
     label: "BIM",
@@ -39,7 +38,7 @@ const services = [
     description:
       "Revit-based coordination workflows, model integration, and production support within collaborative BIM environments.",
     image: "/services/bim.jpg",
-    href: "/services",
+    href: "/projects",
   },
   {
     label: "Delivery",
@@ -47,7 +46,7 @@ const services = [
     description:
       "Flexible technical support for project teams during fast-paced delivery stages and complex documentation workflows.",
     image: "/services/delivery.jpg",
-    href: "/services",
+    href: "/projects",
   },
   {
     label: "Workflow",
@@ -55,11 +54,11 @@ const services = [
     description:
       "Experience adapting to different documentation standards, coordination workflows, and project delivery requirements.",
     image: "/services/workflows.jpg",
-    href: "/services",
+    href: "/projects",
   },
 ];
 
-function ServiceCard({
+function ProjectCard({
   label,
   title,
   description,
@@ -120,10 +119,13 @@ function ServiceCard({
       className="relative flex h-105 w-72 shrink-0 snap-start scroll-ml-(--scroll-padding) flex-col justify-between overflow-hidden border border-black/10 bg-white sm:w-96"
     >
       <div className="relative h-48 border-b border-black/10 bg-gray-100">
-        <img
+        <Image
           src={image}
           alt=""
-          className="absolute inset-0 h-full w-full object-cover grayscale"
+          width={400}
+          height={200}
+          draggable={false}
+          className="absolute inset-0 h-full w-full select-none object-cover grayscale"
         />
       </div>
 
@@ -141,7 +143,7 @@ function ServiceCard({
             href={href}
             className="inline-flex items-center gap-2 text-sm font-medium text-gray-950"
           >
-            Explore service
+            View project
             <ArrowLongRightIcon className="size-5" />
           </Link>
         </div>
@@ -150,11 +152,15 @@ function ServiceCard({
   );
 }
 
-export function ServicesCarousel() {
+export function ProjectsCarousel() {
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const { scrollX } = useScroll({ container: scrollRef });
   const [setReferenceWindowRef, bounds] = useMeasure();
   const [activeIndex, setActiveIndex] = useState(0);
+
+  const isDraggingRef = useRef(false);
+  const startXRef = useRef(0);
+  const scrollLeftRef = useRef(0);
 
   useMotionValueEvent(scrollX, "change", (x) => {
     const firstChild = scrollRef.current?.children[0] as
@@ -185,38 +191,73 @@ export function ServicesCarousel() {
     });
   }
 
+  function handlePointerDown(event: React.PointerEvent<HTMLDivElement>) {
+    if (!scrollRef.current) return;
+
+    isDraggingRef.current = true;
+    startXRef.current = event.clientX;
+    scrollLeftRef.current = scrollRef.current.scrollLeft;
+
+    scrollRef.current.setPointerCapture(event.pointerId);
+  }
+
+  function handlePointerMove(event: React.PointerEvent<HTMLDivElement>) {
+    if (!isDraggingRef.current || !scrollRef.current) return;
+
+    const diff = event.clientX - startXRef.current;
+    scrollRef.current.scrollLeft = scrollLeftRef.current - diff;
+  }
+
+  function handlePointerUp(event: React.PointerEvent<HTMLDivElement>) {
+    if (!scrollRef.current) return;
+
+    isDraggingRef.current = false;
+    scrollRef.current.releasePointerCapture(event.pointerId);
+  }
+
+  function handlePointerLeave() {
+    isDraggingRef.current = false;
+  }
+
   return (
-    <section className="overflow-hidden py-24 sm:py-32 ">
+    <section className="overflow-hidden py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div ref={setReferenceWindowRef}>
           <p className="text-sm font-medium uppercase tracking-[0.2em] text-gray-500">
-            Services
+            Projects
           </p>
 
-          <h2 className="mt-3 max-w-3xl text-3xl font-semibold tracking-tight text-gray-950 sm:text-5xl">
-            BIM support for every stage of project delivery.
+          <h2 className="mt-3 max-w-3xl text-3xl font-semibold tracking-tight text-gray-950 text-balance sm:text-5xl">
+            Selected project experience across documentation and BIM delivery
           </h2>
 
-          <p className="mt-6 max-w-2xl text-base leading-7 text-gray-600">
-            DETAILICA supports AEC teams with architectural documentation,
-            structural BIM, coordination, and technical project delivery.
+          <p className="mt-6 max-w-2xl text-base leading-7 text-gray-600 text-balance">
+            A look at the project types, delivery stages, and technical
+            workflows we support for architecture, engineering, and construction
+            teams.
           </p>
         </div>
       </div>
 
       <div
         ref={scrollRef}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerUp}
+        onPointerLeave={handlePointerLeave}
         className={clsx(
-          "mt-14 flex gap-8 px-(--scroll-padding)",
-          "scrollbar-none [&::-webkit-scrollbar]:hidden",
+          "mt-14 flex cursor-grab gap-8 px-(--scroll-padding) active:cursor-grabbing",
+          "scrollbar-none select-none [&::-webkit-scrollbar]:hidden",
           "snap-x snap-mandatory overflow-x-auto overscroll-x-contain scroll-smooth",
+          "touch-pan-x",
           "[--scroll-padding:max(--spacing(4),calc((100vw-(var(--container-7xl)))/2))] sm:[--scroll-padding:max(--spacing(6),calc((100vw-(var(--container-7xl)))/2))] lg:[--scroll-padding:max(--spacing(8),calc((100vw-(var(--container-7xl)))/2))]",
         )}
       >
-        {services.map((service, index) => (
-          <ServiceCard
-            key={service.title}
-            {...service}
+        {projects.map((project, index) => (
+          <ProjectCard
+            key={project.title}
+            {...project}
             bounds={bounds}
             scrollX={scrollX}
             onClick={() => scrollTo(index)}
@@ -229,20 +270,20 @@ export function ServicesCarousel() {
       <div className="mx-auto mt-10 max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
           <Link
-            href="/services"
+            href="/projects"
             className="inline-flex items-center gap-2 text-sm font-medium text-gray-950"
           >
-            View all services
+            View all projects
             <ArrowLongRightIcon className="size-5" />
           </Link>
 
           <div className="hidden gap-2 sm:flex">
-            {services.map((service, index) => (
+            {projects.map((project, index) => (
               <Headless.Button
-                key={service.title}
+                key={project.title}
                 onClick={() => scrollTo(index)}
                 data-active={activeIndex === index ? true : undefined}
-                aria-label={`Scroll to ${service.title}`}
+                aria-label={`Scroll to ${project.title}`}
                 className={clsx(
                   "size-2.5 border border-transparent bg-gray-300 transition",
                   "data-active:bg-gray-500 data-hover:bg-gray-400",

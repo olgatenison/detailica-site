@@ -90,14 +90,14 @@ export function ContactSection() {
     "mt-4 block w-full resize-none border-0 border-b-2 border-gray-950 bg-transparent px-0 py-3 text-base text-gray-950 outline-none shadow-none placeholder:text-gray-500 focus:border-gray-400 focus:outline-none focus:ring-0 focus:shadow-none";
 
   return (
-    <section className="bg-white px-4 py-24 text-gray-950 sm:px-6 lg:px-8">
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-16 lg:grid-cols-2 lg:gap-24">
+    <section className="bg-white  py-24 text-gray-950 ">
+      <div className="mx-auto grid max-w-7xl px-4 sm:px-6 lg:px-8 grid-cols-1 gap-16 lg:grid-cols-2 lg:gap-24">
         <div>
-          <h1 className="max-w-lg text-6xl font-semibold tracking-tight text-balance sm:text-7xl ">
+          <h1 className="max-w-lg text-6xl font-semibold tracking-tight text-balance sm:text-7xl">
             Let’s make it done together
           </h1>
 
-          <div className="text-base leading-7 text-gray-500 sm:text-lg max-w-xl mt-12">
+          <div className="mt-12 max-w-xl text-base leading-7 text-gray-500 sm:text-lg">
             <p>
               We provide architectural, structural, and BIM support for building
               and infrastructure projects.
@@ -110,30 +110,26 @@ export function ContactSection() {
             </p>
           </div>
 
-          <div className="mt-12 text-sm leading-6">
-            <Link href="/" title="Home" className="flex items-center mb-6">
-              <Image
-                src="/logo-line.svg"
-                alt="Logo"
-                width={80}
-                height={26}
-                className="h-5 w-auto sm:h-6"
-                priority
-              />
-            </Link>
-            <a
-              href="mailto:hello@detailica.com"
-              className="text-gray-950 underline underline-offset-4 "
-            >
-              our e-mail: hello@detailica.com
-            </a>
+          <div className="mt-12 text-gray-500  leading-6">
+            <p className="">
+              Prefer to start with an email?{" "}
+              <a
+                href="mailto:hello@detailica.com"
+                className="text-gray-950 underline underline-offset-4 transition hover:text-gray-500"
+              >
+                hello@detailica.com
+              </a>
+            </p>
           </div>
         </div>
 
         <form className="w-full" onSubmit={handleSubmit} noValidate>
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div>
-              <label htmlFor="name" className="block text-base font-medium">
+              <label
+                htmlFor="name"
+                className="mb-1 block text-base font-medium"
+              >
                 Name <span aria-hidden="true">*</span>
               </label>
 
@@ -147,12 +143,15 @@ export function ContactSection() {
               />
 
               {errors.name && (
-                <p className="mt-2 text-sm text-[#D15052]">{errors.name}</p>
+                <p className="mt-1 text-sm text-[#D15052]">{errors.name}</p>
               )}
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-base font-medium">
+              <label
+                htmlFor="email"
+                className="mb-1 block text-base font-medium"
+              >
                 Email <span aria-hidden="true">*</span>
               </label>
 
@@ -166,12 +165,15 @@ export function ContactSection() {
               />
 
               {errors.email && (
-                <p className="mt-2 text-sm text-[#D15052]">{errors.email}</p>
+                <p className="mt-1 text-sm text-[#D15052]">{errors.email}</p>
               )}
             </div>
 
             <div>
-              <label htmlFor="message" className="block text-base font-medium">
+              <label
+                htmlFor="message"
+                className="mb-1 block text-base font-medium"
+              >
                 Message <span aria-hidden="true">*</span>
               </label>
 
@@ -179,13 +181,13 @@ export function ContactSection() {
                 id="message"
                 name="message"
                 required
-                rows={5}
+                rows={4}
                 placeholder="Tell us about your project, required support, timeline, or documentation scope."
                 className={textareaClassName}
               />
 
               {errors.message && (
-                <p className="mt-2 text-sm text-[#D15052]">{errors.message}</p>
+                <p className="mt-1 text-sm text-[#D15052]">{errors.message}</p>
               )}
             </div>
 
@@ -196,7 +198,7 @@ export function ContactSection() {
                   name="privacy"
                   type="checkbox"
                   required
-                  className="mt-1 size-4 border-gray-950 text-gray-950 outline-none shadow-none focus:outline-none focus:ring-0 focus:shadow-none"
+                  className="mt-1 size-4 accent-gray-950 border-gray-950 outline-none shadow-none focus:outline-none focus:ring-0 focus:shadow-none"
                 />
 
                 <label
@@ -215,7 +217,7 @@ export function ContactSection() {
               </div>
 
               {errors.privacy && (
-                <p className="mt-2 text-sm text-[#D15052]">{errors.privacy}</p>
+                <p className="mt-1 text-sm text-[#D15052]">{errors.privacy}</p>
               )}
             </div>
 
@@ -230,7 +232,7 @@ export function ContactSection() {
             <button
               type="submit"
               disabled={isSending}
-              className="inline-flex h-11 items-center justify-center border border-gray-950 bg-gray-950 px-6 text-sm font-medium text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60 w-full"
+              className="inline-flex h-11 w-full items-center justify-center border border-gray-950 bg-gray-950 px-6 text-sm font-medium text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isSending ? "Sending..." : "Send message"}
             </button>

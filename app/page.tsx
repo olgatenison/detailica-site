@@ -4,7 +4,7 @@ import { DetailicaHero } from "./components/DetailicaHero";
 import { DetailicaIntroStats } from "./components/DetailicaIntroStats";
 import DetailicaServices from "./components/DetailicaServices";
 import GlobalPresenceSection from "./components/Map";
-import { ServicesCarousel } from "./components/ServicesCarousel";
+import { ProjectsCarousel } from "./components/ProjectsCarousel";
 
 export default function Home() {
   return (
@@ -13,7 +13,7 @@ export default function Home() {
       <GlobalPresenceSection />
       <DetailicaIntroStats />
       <DetailicaServices />
-      <ServicesCarousel />
+      <ProjectsCarousel />
       <ContactSection />
     </div>
   );

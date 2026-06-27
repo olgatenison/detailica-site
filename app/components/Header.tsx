@@ -109,18 +109,19 @@ function DesktopNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="relative hidden lg:flex">
+    <nav aria-label="Main navigation" className="relative hidden lg:flex">
       {links.map(({ href, label }) => {
-        const active = pathname === href;
+        const active = pathname === href || pathname.startsWith(`${href}/`);
 
         return (
           <PlusGridItem key={href} className="flex">
             <Link
               href={href}
               aria-current={active ? "page" : undefined}
+              suppressHydrationWarning
               className={clsx(
-                "flex items-center px-4 py-3 text-base font-medium transition-colors hover:bg-black/2.5",
-                active ? "text-gray-950" : "text-gray-600 hover:text-gray-950",
+                "flex items-center px-4 py-3 text-base font-medium transition-colors hover:bg-black/2.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black",
+                active ? "text-black" : "text-gray-500 hover:text-black",
               )}
             >
               {label}
@@ -137,7 +138,7 @@ function DesktopNav() {
 function MobileNavButton({ open }: { open: boolean }) {
   return (
     <DisclosureButton
-      className="relative flex size-12 items-center justify-center self-center rounded-lg data-hover:bg-black/5 lg:hidden"
+      className="relative flex size-12 items-center justify-center self-center rounded-lg data-hover:bg-black/5 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-black lg:hidden"
       aria-label={open ? "Close main menu" : "Open main menu"}
     >
       <AnimatePresence initial={false} mode="wait">
@@ -149,7 +150,7 @@ function MobileNavButton({ open }: { open: boolean }) {
             exit={{ opacity: 0, rotate: 90 }}
             transition={{ duration: 0.15 }}
           >
-            <XMarkIcon className="size-6" />
+            <XMarkIcon className="size-6" aria-hidden="true" />
           </motion.span>
         ) : (
           <motion.span
@@ -159,7 +160,7 @@ function MobileNavButton({ open }: { open: boolean }) {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
           >
-            <Bars2Icon className="size-6" />
+            <Bars2Icon className="size-6" aria-hidden="true" />
           </motion.span>
         )}
       </AnimatePresence>
@@ -172,9 +173,12 @@ function MobileNav() {
 
   return (
     <DisclosurePanel className="relative lg:hidden">
-      <div className="flex flex-col gap-4 px-4 py-4 sm:px-6">
+      <nav
+        aria-label="Mobile navigation"
+        className="flex flex-col gap-4 px-4 py-4 sm:px-6"
+      >
         {links.map(({ href, label }, i) => {
-          const active = pathname === href;
+          const active = pathname === href || pathname.startsWith(`${href}/`);
 
           return (
             <motion.div
@@ -187,9 +191,10 @@ function MobileNav() {
                 <Link
                   href={href}
                   aria-current={active ? "page" : undefined}
+                  suppressHydrationWarning
                   className={clsx(
-                    "block text-base font-medium",
-                    active ? "text-gray-950" : "text-gray-600",
+                    "block text-base font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black",
+                    active ? "text-black" : "text-gray-500 hover:text-black",
                   )}
                 >
                   {label}
@@ -198,7 +203,7 @@ function MobileNav() {
             </motion.div>
           );
         })}
-      </div>
+      </nav>
 
       <div className="absolute inset-x-0 top-0 border-t border-black/5" />
       <div className="absolute inset-x-0 top-2 border-t border-black/5" />
@@ -217,10 +222,14 @@ export function Navbar({ banner }: { banner?: React.ReactNode }) {
             <PlusGridRow className="relative flex justify-between">
               <div className="relative flex items-center gap-6">
                 <PlusGridItem className="py-3">
-                  <Link href="/" title="Home" className="flex items-center">
+                  <Link
+                    href="/"
+                    aria-label="Go to homepage"
+                    className="flex items-center focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-black"
+                  >
                     <Image
                       src="/logo-line.svg"
-                      alt="Logo"
+                      alt="DETAILICA"
                       width={80}
                       height={26}
                       className="h-5 w-auto sm:h-6"

@@ -2,12 +2,13 @@
 
 import {
   motion,
-  useInView,
   useMotionValue,
+  useReducedMotion,
   useSpring,
   useTransform,
 } from "framer-motion";
 import { useEffect, useRef } from "react";
+import { useInView } from "framer-motion";
 
 const stats = [
   {
@@ -58,59 +59,85 @@ const workflowCards = [
 function AnimatedNumber({
   value,
   suffix = "",
+  label,
+  start,
 }: {
   value: number;
   suffix?: string;
+  label: string;
+  start: boolean;
 }) {
-  const ref = useRef<HTMLSpanElement | null>(null);
-  const isInView = useInView(ref, { once: true, margin: "-80px" });
+  const shouldReduceMotion = useReducedMotion();
 
-  const motionValue = useMotionValue(0);
+  const motionValue = useMotionValue(shouldReduceMotion ? value : 0);
   const springValue = useSpring(motionValue, {
     damping: 28,
     stiffness: 90,
   });
 
-  const rounded = useTransform(springValue, (latest) => {
-    return Math.round(latest).toLocaleString("en-US");
-  });
+  const rounded = useTransform(springValue, (latest) =>
+    Math.round(latest).toLocaleString("en-US"),
+  );
 
   useEffect(() => {
-    if (isInView) {
+    if (shouldReduceMotion || start) {
       motionValue.set(value);
     }
-  }, [isInView, motionValue, value]);
+  }, [motionValue, shouldReduceMotion, start, value]);
+
+  const readableValue = `${value.toLocaleString("en-US")}${suffix}`;
 
   return (
-    <span ref={ref}>
-      <motion.span>{rounded}</motion.span>
-      {suffix}
+    <span aria-label={`${readableValue} ${label}`}>
+      <span aria-hidden="true">
+        <motion.span>{rounded}</motion.span>
+        {suffix}
+      </span>
     </span>
   );
 }
 
 export function DetailicaIntroStats() {
+  const shouldReduceMotion = useReducedMotion();
+
+  const statsRef = useRef<HTMLDivElement | null>(null);
+  const isStatsInView = useInView(statsRef, {
+    once: true,
+    amount: 0.2,
+  });
+
+  const fadeIn = shouldReduceMotion
+    ? {}
+    : {
+        initial: { opacity: 0, y: 24 },
+        whileInView: { opacity: 1, y: 0 },
+        viewport: { once: true, margin: "-80px" },
+      };
+
   return (
-    <section className="relative overflow-hidden bg-white pb-10 pt-6 ">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Первый ряд: текст + цифры */}
+    <section
+      aria-labelledby="workflow-experience-title"
+      className="relative overflow-hidden bg-white lg:pt-20 pt-16 "
+    >
+      <div className="mx-auto max-w-xl md:max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16">
           <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
+            {...fadeIn}
             transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
             className="max-w-2xl"
           >
-            <p className="text-sm font-medium tracking-widest text-gray-500 uppercase">
+            <p className="text-base font-medium tracking-widest text-gray-500 uppercase md:text-left text-center ">
               How We Integrate With Project Teams
             </p>
 
-            <h2 className="mt-5 text-xl font-semibold text-gray-950 text-balance sm:text-5xl">
+            <h2
+              id="workflow-experience-title"
+              className="mt-5 text-4xl font-semibold text-gray-950 text-balance lg:text-5xl  md:text-left text-center"
+            >
               International Workflow Experience
             </h2>
 
-            <p className="mt-6 max-w-2xl text-base leading-7 font-light text-gray-500 text-balance sm:text-lg">
+            <p className="mt-6 w-full text-lg leading-7 font-light text-gray-600 text-balance md:max-w-lg lg:max-w-2xl  md:text-left text-center">
               Experience adapting documentation workflows to local standards,
               coordination practices and project delivery requirements across
               different regions.
@@ -118,19 +145,17 @@ export function DetailicaIntroStats() {
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
+            ref={statsRef}
+            {...fadeIn}
             transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
-            className=""
           >
-            <p className="text-sm font-medium tracking-widest text-gray-500 uppercase">
+            <p className="text-base font-medium uppercase tracking-widest text-gray-500">
               The numbers
             </p>
 
             <hr className="mt-5 border-t border-gray-200" />
 
-            <dl className="mt-6 grid grid-cols-2 gap-x-8 gap-y-5">
+            <dl className="mt-6 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-2 gap-x-8 gap-y-5">
               {stats.map((stat) => (
                 <div
                   key={stat.label}
@@ -141,7 +166,12 @@ export function DetailicaIntroStats() {
                   </dt>
 
                   <dd className="order-first text-5xl font-medium tracking-tight text-gray-950 sm:text-6xl">
-                    <AnimatedNumber value={stat.value} suffix={stat.suffix} />
+                    <AnimatedNumber
+                      value={stat.value}
+                      suffix={stat.suffix}
+                      label={stat.label}
+                      start={isStatsInView}
+                    />
                   </dd>
                 </div>
               ))}
@@ -149,43 +179,51 @@ export function DetailicaIntroStats() {
           </motion.div>
         </div>
 
-        {/* Второй ряд: 4 карточки */}
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
+          {...fadeIn}
           transition={{ duration: 0.6, delay: 0.25, ease: "easeOut" }}
-          className="mt-14 "
+          className="mt-14"
         >
-          <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-4">
-            {workflowCards.map((card, index) => (
-              <motion.article
-                key={card.title}
-                initial={{ opacity: 0, y: 28 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-120px" }}
-                transition={{
-                  duration: 0.5,
-                  delay: 0.15 + index * 0.08,
-                  ease: "easeOut",
-                }}
-                className="min-h-64 rounded-4xl  "
-              >
-                <p className="text-xs font-medium uppercase tracking-[0.18em] text-accent">
-                  {card.eyebrow}
-                </p>
+          <div className="grid grid-cols-1 gap-6 md:gap-12 sm:grid-cols-2 lg:grid-cols-4">
+            {workflowCards.map((card, index) => {
+              const cardMotion = shouldReduceMotion
+                ? {}
+                : {
+                    initial: { opacity: 0, y: 28 },
+                    whileInView: { opacity: 1, y: 0 },
+                    viewport: { once: true, margin: "-120px" },
+                  };
 
-                <div className="mt-5 h-px w-12 bg-accent" />
+              return (
+                <motion.article
+                  key={card.title}
+                  {...cardMotion}
+                  transition={{
+                    duration: 0.5,
+                    delay: 0.15 + index * 0.08,
+                    ease: "easeOut",
+                  }}
+                  className="max-w-full sm:max-w-64 md:max-w-full min-h-40 lg:min-h-64 rounded-4xl sm:mb-0 mb-12"
+                >
+                  <p className="text-base font-medium uppercase tracking-[0.18em] text-accent">
+                    {card.eyebrow}
+                  </p>
 
-                <h3 className="mt-6 text-xl font-semibold text-gray-950 hover:text-accent">
-                  {card.title}
-                </h3>
+                  <div
+                    aria-hidden="true"
+                    className="mt-5 h-px  w-12 bg-accent"
+                  />
 
-                <p className="mt-4 text-sm leading-6 text-gray-500">
-                  {card.text}
-                </p>
-              </motion.article>
-            ))}
+                  <h3 className="mt-6 text-xl font-semibold text-gray-950">
+                    {card.title}
+                  </h3>
+
+                  <p className="mt-4 text-base leading-6 text-gray-500">
+                    {card.text}
+                  </p>
+                </motion.article>
+              );
+            })}
           </div>
         </motion.div>
       </div>

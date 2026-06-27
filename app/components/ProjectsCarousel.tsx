@@ -125,7 +125,7 @@ function ProjectCard({
           width={400}
           height={200}
           draggable={false}
-          className="absolute inset-0 h-full w-full select-none object-cover grayscale"
+          className="absolute inset-0 h-full w-full select-none object-cover "
         />
       </div>
 
@@ -136,12 +136,12 @@ function ProjectCard({
 
         <h3 className="mt-4 text-xl font-semibold text-gray-950">{title}</h3>
 
-        <p className="mt-4 text-sm leading-6 text-gray-600">{description}</p>
+        <p className="mt-4 text-base leading-6 text-gray-600">{description}</p>
 
         <div className="mt-auto pt-6">
           <Link
             href={href}
-            className="inline-flex items-center gap-2 text-sm font-medium text-gray-950"
+            className="inline-flex items-center gap-2 text-base font-medium text-gray-950"
           >
             View project
             <ArrowLongRightIcon className="size-5" />
@@ -223,15 +223,15 @@ export function ProjectsCarousel() {
     <section className="overflow-hidden py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div ref={setReferenceWindowRef}>
-          <p className="text-sm font-medium uppercase tracking-[0.2em] text-gray-500">
+          <p className="text-base font-medium uppercase tracking-widest text-gray-500">
             Projects
           </p>
 
-          <h2 className="mt-3 max-w-3xl text-3xl font-semibold tracking-tight text-gray-950 text-balance sm:text-5xl">
+          <h2 className="mt-5 text-4xl font-semibold text-gray-950 text-balance lg:text-5xl">
             Selected project experience across documentation and BIM delivery
           </h2>
 
-          <p className="mt-6 max-w-2xl text-base leading-7 text-gray-600 text-balance">
+          <p className="mt-6 mb-32 w-full text-lg leading-7 font-light text-gray-600 text-balance  md:max-w-lg sm:mb-0 lg:max-w-2xl">
             A look at the project types, delivery stages, and technical
             workflows we support for architecture, engineering, and construction
             teams.
@@ -247,7 +247,7 @@ export function ProjectsCarousel() {
         onPointerCancel={handlePointerUp}
         onPointerLeave={handlePointerLeave}
         className={clsx(
-          "mt-14 flex cursor-grab gap-8 px-(--scroll-padding) active:cursor-grabbing",
+          "mt-6 md:mt-14 flex cursor-grab gap-8 px-(--scroll-padding) active:cursor-grabbing",
           "scrollbar-none select-none [&::-webkit-scrollbar]:hidden",
           "snap-x snap-mandatory overflow-x-auto overscroll-x-contain scroll-smooth",
           "touch-pan-x",
@@ -271,7 +271,7 @@ export function ProjectsCarousel() {
         <div className="flex items-center justify-between">
           <Link
             href="/projects"
-            className="inline-flex items-center gap-2 text-sm font-medium text-gray-950"
+            className="inline-flex items-center gap-2 text-base font-medium text-gray-950"
           >
             View all projects
             <ArrowLongRightIcon className="size-5" />

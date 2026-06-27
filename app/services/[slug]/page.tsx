@@ -42,11 +42,11 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
 
   return (
     <main className="bg-white">
-      <section className="py-24 sm:py-32">
+      <section className="py-12 sm:pb-20 sm:pt-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <Link
             href="/services"
-            className="inline-flex items-center gap-2 text-sm font-medium text-gray-950"
+            className="inline-flex items-center gap-2 text-base font-medium text-gray-950"
           >
             <ArrowLongLeftIcon className="size-5" />
             Back to services
@@ -54,7 +54,7 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
 
           <div className="mt-12 grid gap-12 lg:grid-cols-[1fr_0.85fr] lg:gap-20">
             <div>
-              <p className="text-sm font-medium uppercase tracking-[0.2em] text-gray-500">
+              <p className="text-base font-medium uppercase tracking-widest text-gray-500">
                 {service.eyebrow}
               </p>
 
@@ -67,27 +67,27 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
               </p>
             </div>
 
-            <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
+            <div className="relative aspect-4/3 overflow-hidden bg-gray-100">
               <Image
                 src={service.imageUrl}
                 alt={service.title}
-                width={900}
-                height={700}
+                width={800}
+                height={500}
                 priority
-                className="absolute inset-0 h-full w-full object-cover grayscale"
+                className="absolute inset-0 h-full w-full object-cover "
               />
 
-              <div className="absolute inset-0 ring-1 ring-inset ring-black/10" />
+              {/* <div className="absolute inset-0 ring-1 ring-inset ring-black/10" /> */}
             </div>
           </div>
 
           <div className="mt-20 grid gap-12 lg:grid-cols-[0.65fr_1fr]">
             <div>
-              <h2 className="text-2xl font-semibold tracking-tight text-gray-950">
+              <h2 className="text-3xl font-semibold tracking-tight text-gray-950">
                 What we support
               </h2>
 
-              <p className="mt-4 text-sm leading-6 text-gray-600">
+              <p className="mt-4 text-base leading-6 text-gray-600">
                 Our role is to help your team move from project information to
                 coordinated, structured, and buildable documentation.
               </p>
@@ -102,10 +102,10 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
                 {service.features.map((feature) => (
                   <div
                     key={feature}
-                    className="border border-black/10 bg-white p-5"
+                    className="border border-black/10 bg-white p-5 flex gap-6 items-center"
                   >
                     <div className="text-xl leading-none text-gray-950">+</div>
-                    <p className="mt-4 text-sm leading-6 text-gray-600">
+                    <p className=" text-lg leading-6 text-gray-600">
                       {feature}
                     </p>
                   </div>
@@ -117,9 +117,9 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
           <div className="mt-20 border-t border-black/10 pt-10">
             <Link
               href="/contact"
-              className="inline-flex h-11 items-center justify-center border border-gray-950 bg-gray-950 px-6 text-sm font-medium text-white transition hover:bg-gray-800"
+              className="inline-flex h-11 items-center justify-center border border-gray-950 bg-gray-950 px-6 text-base font-medium text-white transition hover:bg-gray-800 w-full md:w-lg"
             >
-              Start a project
+              Start your project with us
             </Link>
           </div>
         </div>

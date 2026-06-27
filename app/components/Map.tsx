@@ -146,6 +146,10 @@ function MapPin({
       ? []
       : (country.projects[activeFilter]?.slice(0, 2) ?? []);
 
+  const tooltipId = `map-pin-${country.name
+    .toLowerCase()
+    .replace(/\s+/g, "-")}`;
+
   return (
     <motion.button
       type="button"
@@ -157,13 +161,21 @@ function MapPin({
       onClick={() => {
         if (isActive) onSelect(country);
       }}
+      disabled={!isActive}
+      aria-label={
+        isActive
+          ? `Show projects in ${country.name}`
+          : `${country.name} has no projects for the selected filter`
+      }
+      aria-pressed={isSelected}
+      aria-describedby={isActive ? tooltipId : undefined}
       className={clsx(
-        "group absolute z-0 -translate-x-1/2 -translate-y-1/2 rounded-full transition hover:z-20 focus-visible:z-20",
-        isActive ? "cursor-pointer" : "cursor-default",
+        "group absolute z-0 flex size-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full transition focus-visible:z-20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black",
+        isActive ? "cursor-pointer hover:z-20" : "cursor-default",
       )}
-      aria-label={country.name}
     >
       <span
+        aria-hidden="true"
         className={clsx(
           "block rounded-full transition-all duration-300",
           isSelected ? "size-3.5 ring-6" : "size-2.5 ring-4",
@@ -174,9 +186,12 @@ function MapPin({
       />
 
       <span
+        id={tooltipId}
         className={clsx(
-          "pointer-events-none absolute bottom-5 left-1/2 z-20 w-max max-w-64 -translate-x-1/2 rounded-sm bg-gray-950 px-3 py-2 text-left text-xs font-medium text-white opacity-0 shadow-lg transition-opacity",
-          isActive ? "group-hover:opacity-100" : "hidden",
+          "pointer-events-none absolute bottom-9 left-1/2 z-20 w-max max-w-64 -translate-x-1/2 rounded-sm bg-gray-950 px-3 py-2 text-left text-base font-medium text-white opacity-0 shadow-lg transition-opacity",
+          isActive
+            ? "group-hover:opacity-100 group-focus-visible:opacity-100"
+            : "hidden",
         )}
       >
         <span className="block">{country.name}</span>
@@ -209,9 +224,14 @@ function CountryCard({
   onClose: () => void;
 }) {
   const cardServices = getVisibleServices(country, activeFilter);
+  const titleId = `country-card-${country.name
+    .toLowerCase()
+    .replace(/\s+/g, "-")}`;
 
   return (
     <motion.div
+      role="region"
+      aria-labelledby={titleId}
       initial={{ opacity: 0, y: -14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, ease: "easeOut" }}
@@ -223,7 +243,10 @@ function CountryCard({
             {cardServices.join(" · ")}
           </p>
 
-          <h3 className="mt-2 text-2xl font-semibold text-gray-950">
+          <h3
+            id={titleId}
+            className="mt-2 text-2xl font-semibold text-gray-950"
+          >
             {country.name}
           </h3>
         </div>
@@ -231,7 +254,8 @@ function CountryCard({
         <button
           type="button"
           onClick={onClose}
-          className="self-start text-sm font-medium uppercase text-gray-400 transition hover:text-gray-950"
+          aria-label="Close country details"
+          className="self-start text-sm font-medium uppercase text-gray-400 transition hover:text-gray-950 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-black"
         >
           Close
         </button>
@@ -260,7 +284,7 @@ function CountryCard({
                 {items.map((project) => (
                   <li
                     key={project}
-                    className=" bg-accent/10 px-4 py-3 text-sm font-medium text-gray-800"
+                    className="bg-accent/10 px-4 py-3 text-sm font-medium text-gray-800"
                   >
                     {project}
                   </li>
@@ -285,18 +309,28 @@ export default function GlobalPresenceSection() {
       : null;
 
   return (
-    <section className="relative w-full overflow-hidden bg-white pb-12">
-      <div className="mx-auto max-w-3xl px-6 pt-6 md:pt-18 text-center lg:px-8">
-        <p className="text-sm font-medium tracking-widest text-gray-500 uppercase">
+    <section
+      aria-labelledby="global-presence-title"
+      className="relative w-full overflow-hidden bg-white lg:pt-18 pt-12 lg:px-8"
+    >
+      <div className="mx-auto max-w-3xl px-6 pt-6 text-center ">
+        <p className="text-base font-medium tracking-widest text-gray-500 uppercase">
           Supporting Projects Across 10 Countries
         </p>
 
-        <h2 className="mt-5 text-xl font-semibold text-gray-950 text-balance sm:text-5xl">
+        <h2
+          id="global-presence-title"
+          className="mt-5 text-4xl font-semibold text-gray-950 text-balance lg:text-5xl"
+        >
           International Project Experience
         </h2>
       </div>
 
-      <div className="mx-auto mt-8 flex flex-wrap justify-center gap-3 px-6">
+      <div
+        role="group"
+        aria-label="Filter countries by service"
+        className="mx-auto mt-8 flex flex-wrap justify-center gap-3 px-6"
+      >
         {FILTERS.map((filter) => {
           const isActive = activeFilter === filter;
 
@@ -304,12 +338,13 @@ export default function GlobalPresenceSection() {
             <button
               key={filter}
               type="button"
+              aria-pressed={isActive}
               onClick={() => {
                 setActiveFilter(filter);
                 setSelectedCountry(null);
               }}
               className={clsx(
-                "inline-flex h-6 items-center justify-center border px-3 text-sm font-medium transition",
+                "inline-flex h-6 items-center justify-center border px-3 text-sm font-medium transition focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-black",
                 isActive
                   ? "border-accent text-accent"
                   : "border-white bg-white text-black hover:text-accent",
@@ -323,7 +358,10 @@ export default function GlobalPresenceSection() {
 
       <div className="relative mx-auto mt-10 max-w-5xl px-4 sm:px-6 lg:px-8">
         <div className="relative aspect-636.5/336.5 w-full">
-          <div className="absolute inset-0 mask-[url(/map.svg)] mask-center mask-no-repeat mask-contain bg-gray-300" />
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 mask-[url(/map.svg)] mask-center mask-no-repeat mask-contain bg-gray-300"
+          />
 
           {COUNTRIES.map((country, i) => (
             <MapPin
@@ -337,7 +375,10 @@ export default function GlobalPresenceSection() {
           ))}
 
           {visibleSelectedCountry && (
-            <div className="absolute left-1/2 top-4 z-30 hidden w-[calc(100%-2rem)] max-w-2xl -translate-x-1/2 sm:block sm:top-6">
+            <div
+              aria-live="polite"
+              className="absolute left-1/2 top-4 z-30 hidden w-[calc(100%-2rem)] max-w-2xl -translate-x-1/2 sm:block sm:top-6"
+            >
               <CountryCard
                 country={visibleSelectedCountry}
                 activeFilter={activeFilter}
@@ -348,12 +389,12 @@ export default function GlobalPresenceSection() {
         </div>
       </div>
 
-      <p className="mt-6 text-center text-sm font-medium text-gray-500 sm:hidden">
+      <p className="mt-6 text-center text-base font-medium text-gray-500 sm:hidden">
         Tap a highlighted location
       </p>
 
       {visibleSelectedCountry && (
-        <div className="mx-4 mt-6 sm:hidden">
+        <div aria-live="polite" className="mx-4 mt-6 sm:hidden">
           <CountryCard
             country={visibleSelectedCountry}
             activeFilter={activeFilter}

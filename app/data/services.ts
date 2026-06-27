@@ -5,7 +5,7 @@ export const services = [
     eyebrow: "Architecture",
     title: "Architectural Documentation",
     href: "/services/architectural-documentation",
-    imageUrl: "/services/architectural.jpg",
+    imageUrl: "/services/architectural.png",
     shortDescription:
       "Transforming design intent into coordinated, buildable documentation.",
     intro:
@@ -27,7 +27,7 @@ export const services = [
     eyebrow: "Structure",
     title: "Structural Design & Documentation",
     href: "/services/structural-design-documentation",
-    imageUrl: "/services/structural.jpg",
+    imageUrl: "/services/a3.jpg",
     shortDescription:
       "Translating engineering solutions into clear construction information.",
     intro:
@@ -49,7 +49,7 @@ export const services = [
     eyebrow: "Existing Conditions",
     title: "Existing Conditions & Scan-to-BIM",
     href: "/services/existing-conditions-scan-to-bim",
-    imageUrl: "/services/workflows.jpg",
+    imageUrl: "/services/bim.jpg",
     shortDescription:
       "Transforming existing conditions into accurate, coordinated digital models.",
     intro:

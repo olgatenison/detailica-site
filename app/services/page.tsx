@@ -6,14 +6,17 @@ import { services } from "../data/services";
 export default function ServicesPage() {
   return (
     <main className="bg-white">
-      <section className="py-24 sm:py-32">
+      <section aria-labelledby="services-page-title" className="py-12 sm:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-2xl lg:max-w-4xl">
+          <div>
             <p className="text-sm font-medium uppercase tracking-[0.2em] text-gray-500">
               Services
             </p>
 
-            <h1 className="mt-3 text-4xl font-semibold tracking-tight text-gray-950 text-balance sm:text-6xl">
+            <h1
+              id="services-page-title"
+              className="mt-4 text-5xl font-semibold tracking-tight text-gray-950 text-balance sm:text-7xl"
+            >
               Documentation and BIM support for project delivery
             </h1>
 
@@ -23,66 +26,79 @@ export default function ServicesPage() {
               project delivery.
             </p>
 
-            <div className="mt-16 space-y-16 lg:mt-20">
-              {services.map((service) => (
+            <div className="mt-16 grid grid-cols-1 gap-16 lg:mt-20 lg:grid-cols-3">
+              {services.map((service, index) => (
                 <article
                   key={service.id}
-                  className="relative isolate flex flex-col gap-8 border-b border-black/10 pb-16 last:border-b-0 last:pb-0 lg:flex-row"
+                  className="group flex min-h-150 flex-col overflow-hidden bg-white md:min-h-0 md:flex-row md:gap-8 lg:min-h-150 lg:flex-col lg:gap-0"
                 >
-                  <Link
-                    href={service.href}
-                    className="relative aspect-video overflow-hidden bg-gray-100 sm:aspect-[2/1] lg:aspect-square lg:w-72 lg:shrink-0"
+                  <div
+                    className={
+                      index === 1
+                        ? "flex flex-1 flex-col md:order-2 md:basis-1/2 lg:order-0 lg:basis-auto"
+                        : "flex flex-1 flex-col md:basis-1/2 lg:basis-auto"
+                    }
                   >
-                    <Image
-                      src={service.imageUrl}
-                      alt={service.title}
-                      width={600}
-                      height={600}
-                      className="absolute inset-0 h-full w-full object-cover grayscale transition duration-500 hover:scale-105"
-                    />
+                    <p className="text-sm font-medium uppercase tracking-[0.2em] text-gray-500">
+                      {service.eyebrow}
+                    </p>
 
-                    <div className="absolute inset-0 ring-1 ring-inset ring-black/10" />
-                  </Link>
+                    <h2 className="mt-4 pr-12 text-2xl font-semibold tracking-tight text-gray-950">
+                      <Link
+                        href={service.href}
+                        className="text-balance transition hover:text-gray-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
+                      >
+                        {service.title}
+                      </Link>
+                    </h2>
 
-                  <div className="flex flex-1 flex-col">
-                    <div className="flex items-center gap-x-4 text-xs">
-                      <span className="font-medium uppercase tracking-[0.2em] text-gray-500">
-                        {service.eyebrow}
-                      </span>
-                    </div>
+                    <p className="mt-5 text-base leading-7 text-gray-600">
+                      {service.shortDescription}
+                    </p>
 
-                    <div className="group relative max-w-xl">
-                      <h2 className="mt-3 text-2xl font-semibold tracking-tight text-gray-950 group-hover:text-gray-600">
-                        <Link href={service.href}>
-                          <span className="absolute inset-0" />
-                          {service.title}
-                        </Link>
-                      </h2>
-
-                      <p className="mt-5 text-sm leading-6 text-gray-600">
-                        {service.shortDescription}
-                      </p>
-                    </div>
-
-                    <ul className="mt-6 grid gap-3 text-sm leading-6 text-gray-600 sm:grid-cols-2">
+                    <ul className="mt-7 space-y-3 text-sm leading-6 text-gray-600">
                       {service.features.slice(0, 4).map((feature) => (
                         <li key={feature} className="flex gap-3">
-                          <span className="text-gray-950">+</span>
+                          <span aria-hidden="true" className="text-gray-950">
+                            +
+                          </span>
                           <span>{feature}</span>
                         </li>
                       ))}
                     </ul>
 
-                    <div className="mt-8">
+                    <div className="mt-auto pt-8">
                       <Link
                         href={service.href}
-                        className="inline-flex items-center gap-2 text-sm font-medium text-gray-950"
+                        aria-label={`Read more about ${service.title}`}
+                        className="mb-16 inline-flex items-center gap-2 text-base font-medium text-gray-950 transition hover:text-gray-600 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-black md:mb-0 lg:mb-16"
                       >
                         Read more
-                        <ArrowLongRightIcon className="size-5" />
+                        <ArrowLongRightIcon
+                          aria-hidden="true"
+                          className="size-5"
+                        />
                       </Link>
                     </div>
                   </div>
+
+                  <Link
+                    href={service.href}
+                    aria-label={`Open ${service.title}`}
+                    className={
+                      index === 1
+                        ? "relative mt-auto block aspect-4/3 overflow-hidden bg-gray-100 md:order-1 md:mt-0 md:basis-1/2 lg:order-0 lg:mt-auto lg:basis-auto"
+                        : "relative mt-auto block aspect-4/3 overflow-hidden bg-gray-100 md:mt-0 md:basis-1/2 lg:mt-auto lg:basis-auto"
+                    }
+                  >
+                    <Image
+                      src={service.imageUrl}
+                      alt=""
+                      width={800}
+                      height={600}
+                      className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                    />
+                  </Link>
                 </article>
               ))}
             </div>
